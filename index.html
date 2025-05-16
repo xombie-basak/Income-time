@@ -1,0 +1,235 @@
+// App.jsx
+import React, { useState } from "react";
+import { LanguageContext, translations } from "./lang";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import MainContent from "./components/MainContent";
+import Signup from "./components/Signup";
+import "./App.css";
+
+export default function App() {
+  const [language, setLanguage] = useState("en");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "bn" : "en");
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, toggleLanguage, translations }}>
+      <div className="app">
+        {isLoggedIn ? (
+          <>
+            <Header />
+            <MainContent />
+            <Footer />
+          </>
+        ) : (
+          <Signup onSignup={() => setIsLoggedIn(true)} />
+        )}
+      </div>
+    </LanguageContext.Provider>
+  );
+}
+
+// lang.js
+import React from "react";
+
+export const LanguageContext = React.createContext();
+
+export const translations = {
+  en: {
+    signup: "Sign Up",
+    phone: "Phone Number",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    referral: "Referral Code (optional)",
+    submit: "Submit",
+    withdraw: "Withdraw",
+    workplace: "Work Place",
+    wallet: "My Wallet",
+    account: "My Account",
+    settings: "Settings",
+    home: "Home",
+    addMoney: "Add Money",
+    companyDetails: "Company Details",
+    lang: "Language",
+    withdrawPage: "Withdraw Page",
+    enterNumber: "Enter Number",
+    withdrawAmount: "Withdraw Amount",
+    confirm: "Confirm",
+  },
+  bn: {
+    signup: "রেজিস্টার করুন",
+    phone: "মোবাইল নম্বর",
+    password: "পাসওয়ার্ড",
+    confirmPassword: "কনফার্ম পাসওয়ার্ড",
+    referral: "রেফার কোড (ঐচ্ছিক)",
+    submit: "সাবমিট",
+    withdraw: "উইথড্র",
+    workplace: "ওয়ার্ক প্লেস",
+    wallet: "মাই ওয়ালেট",
+    account: "আমার একাউন্ট",
+    settings: "সেটিংস",
+    home: "হোম",
+    addMoney: "অ্যাড মানি",
+    companyDetails: "কোম্পানির বিবরণ",
+    lang: "ভাষা",
+    withdrawPage: "উইথড্র পেইজ",
+    enterNumber: "নম্বর দিন",
+    withdrawAmount: "উইথড্র এমাউন্ট",
+    confirm: "নিশ্চিত করুন",
+  },
+};
+
+// components/Signup.jsx
+import React, { useContext, useState } from "react";
+import { LanguageContext } from "../lang";
+
+export default function Signup({ onSignup }) {
+  const { language, translations } = useContext(LanguageContext);
+  const t = translations[language];
+
+  const [form, setForm] = useState({ phone: "", pass: "", confirm: "", ref: "" });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (form.pass === form.confirm) onSignup();
+    else alert("Passwords do not match");
+  };
+
+  return (
+    <div className="signup-form">
+      <h2>{t.signup}</h2>
+      <form onSubmit={handleSubmit}>
+        <input name="phone" type="text" placeholder={t.phone} onChange={handleChange} />
+        <input name="pass" type="password" placeholder={t.password} onChange={handleChange} />
+        <input name="confirm" type="password" placeholder={t.confirmPassword} onChange={handleChange} />
+        <input name="ref" type="text" placeholder={t.referral} onChange={handleChange} />
+        <button type="submit">{t.submit}</button>
+      </form>
+    </div>
+  );
+}
+
+// components/Header.jsx
+import React, { useContext } from "react";
+import { LanguageContext } from "../lang";
+
+export default function Header() {
+  const { language, toggleLanguage, translations } = useContext(LanguageContext);
+  const t = translations[language];
+
+  return (
+    <header>
+      <h1>Dashboard</h1>
+      <div className="nav">
+        <button>{t.withdraw}</button>
+        <button>{t.workplace}</button>
+        <button>{t.wallet}</button>
+        <button>{t.account}</button>
+      </div>
+      <div className="lang-toggle" onClick={toggleLanguage}>
+        {t.lang}: {language === "en" ? "EN" : "BN"}
+      </div>
+    </header>
+  );
+}
+
+// components/Footer.jsx
+import React, { useContext } from "react";
+import { LanguageContext } from "../lang";
+
+export default function Footer() {
+  const { language, translations } = useContext(LanguageContext);
+  const t = translations[language];
+
+  return (
+    <footer>
+      <button>{t.settings}</button>
+      <button>{t.home}</button>
+      <button>{t.addMoney}</button>
+      <button>{t.companyDetails}</button>
+    </footer>
+  );
+}
+
+// components/MainContent.jsx
+import React, { useContext } from "react";
+import { LanguageContext } from "../lang";
+
+export default function MainContent() {
+  const { language, translations } = useContext(LanguageContext);
+  const t = translations[language];
+
+  return (
+    <main>
+      <h2>{t.withdrawPage}</h2>
+      <form>
+        <input type="text" placeholder={t.enterNumber} />
+        <input type="password" placeholder="Password" />
+        <input type="number" placeholder={t.withdrawAmount} />
+        <button>{t.confirm}</button>
+      </form>
+    </main>
+  );
+}
+
+// App.css
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+}
+
+header, footer {
+  display: flex;
+  justify-content: space-around;
+  background-color: #222;
+  color: white;
+  padding: 10px;
+}
+
+.nav button, footer button {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.lang-toggle {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.signup-form, main {
+  padding: 20px;
+  background: white;
+  margin: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.signup-form input, main input {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.signup-form button, main button {
+  background: green;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
